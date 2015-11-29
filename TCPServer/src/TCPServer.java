@@ -17,7 +17,7 @@ class TCPServer {
                 int lisPort = 0;
                 // create a server socket (TCP)
                 ServerSocket welcomeSocket = new ServerSocket(lisPort); 
-                System.out.println(welcomeSocket.getLocalPort());
+                System.out.println(welcomeSocket.getLocalPort()); 
                 // loop infinitely (process clients sequentially)
                 while(true) {
                         // Wait and accept client connection
