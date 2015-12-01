@@ -2,6 +2,8 @@
 import java.io.*; // Provides for system input and output through data 
 // streams, serialization and the file system
 import java.net.*; // Provides the classes for implementing networking 
+import java.util.ArrayList;
+import java.util.Arrays;
 // applications
 
 // TCP Client class
@@ -23,65 +25,113 @@ class TCPClient {
             BufferedReader inFromUser
                     = new BufferedReader(new InputStreamReader(System.in));
 
-            // create a client socket (TCP) and connect to server
-            Socket clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
-
-            // create an output stream from the socket output stream
-            DataOutputStream outToServer
-                    = new DataOutputStream(clientSocket.getOutputStream());
-
-            // create an input stream from the socket input stream
-            BufferedReader inFromServer = new BufferedReader(
-                    new InputStreamReader(clientSocket.getInputStream()));
+            
 
                     // read a line form the standard input
             //sentence = inFromUser.readLine();
             while (true) {
-                //a user puts in a string
-                if ((sentence = inFromUser.readLine()) != null) {
-                    // check if the sentence is a specific phrase, if it is, then you want to do things
-                    if (sentence.equalsIgnoreCase("help")) {
-                        System.out.println("Help Menu:");
-                        System.out.println("-----------------------------------------------------------------------------");
-                        System.out.println("help: print help menu.\n");
-                        System.out.println("put <name> <value> <type>: Add the name record to the service database or update an existing record.\n");
-                        System.out.println("get <name> <type>: Get the value of the requested record, if not found return \"not found\".\n");
-                        System.out.println("del <name> <type>: Remove a name record from service database, if name record is not found return \"not found\".\n");
-                        System.out.println("browse: get all the name records in service database. Returns the name and type of the record, if the database is empty return \"Database is empty\".\n");
-                        System.out.println("exit: exit the program and close the connection.\n");
-                    } else if (sentence.equalsIgnoreCase("put")) {
-                        // send the sentence read to the server
-                        modifiedSentence = sentence.concat(" \r\n");
-                        outToServer.writeBytes(sentence + '\n');
+                
+                // create a client socket (TCP) and connect to server
+                Socket clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
+                
+                // create an output stream from the socket output stream
+                DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
 
-                    } else if (sentence.equalsIgnoreCase("get")) {
-
-                    } else if (sentence.equalsIgnoreCase("del")) {
-
-                    } else if (sentence.equalsIgnoreCase("browse")) {
-
-                    } else if (sentence.equalsIgnoreCase("quit")) {
-                        clientSocket.close();
-
-                    } else {
-                        //input is not a valid input command
+                // create an input stream from the socket input stream
+                BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                
+                sentence = inFromUser.readLine();
+                        //parse
+                //modifiedSentence = sentence.concat(" \r\n");
+                //send the sentence read to the server
+                outToServer.writeBytes(sentence + '\n');
+                
+                         
+                
+                
+                if(sentence.trim().equalsIgnoreCase("help"))
+                {
+                    //print help menu
+                }
+                else if(sentence.trim().equalsIgnoreCase("exit"))
+                {
+                    System.exit(0);
+                }
+                else if(sentence.trim().startsWith("put"))
+                {   
+                    //get the reply from the server
+                    modifiedSentence = inFromServer.readLine();
+                    //print the returned sentence
+                    System.out.println("FROM SERVER: " + modifiedSentence);
+                    //close the socket
+                    clientSocket.close();
+                }
+                else if(sentence.trim().startsWith("get"))
+                {
+                    //get the reply from the server
+                    modifiedSentence = inFromServer.readLine();
+                    //print the returned sentence
+                    System.out.println("FROM SERVER: " + modifiedSentence);
+                    //close the socket
+                    clientSocket.close();
+                }
+                else if(sentence.trim().startsWith("del"))
+                {
+                    //delete was good, it was acked
+                    //else it was errored
+                    //get the reply from the server
+                    modifiedSentence = inFromServer.readLine();
+                    //print the returned sentence
+                    System.out.println("FROM SERVER: " + modifiedSentence);
+                    //close the socket
+                    clientSocket.close();
+                }
+                else if(sentence.trim().startsWith("browse"))
+                {
+                    //for browse, you returned a message, if the message was a database empty, print, otehrwise parse
+                    //get the reply from the server
+                    modifiedSentence = inFromServer.readLine();
+                    //print the returned sentence
+                    
+                    //check first number
+                    if(modifiedSentence.startsWith("100"))
+                    {
+                        //database was empty
+                        System.out.println("FROM SERVER: " + modifiedSentence);
                     }
+                    else
+                    {
+                        //parse the command that came back and then print out all the stuff onto the screen
+                        //tokenize
+                        String[] parts = modifiedSentence.split("&");
+    
+                        // turn list into an arraylist
+                        ArrayList<String> arrayOfSentenceInputs = new ArrayList<String>(Arrays.asList(parts));
+                        
+                        for(int print = 0; print < arrayOfSentenceInputs.size(); print++)
+                        {
+                            System.out.println(arrayOfSentenceInputs.get(print));
+                        }
+                    }
+                    
+                    
+                    //close the socket
+                    clientSocket.close();
                 }
-                else if ((serverMessage = inFromServer.readLine()) != null) {//server have a message
-                    System.out.println(serverMessage);
+                else
+                {
+                    outToServer.writeBytes(sentence + '\n');
                 }
+                
             }
         } catch (IOException e) {
             System.out.println("error is " + e);
         }
 
-                // send the sentence read to the server
-        //outToServer.writeBytes(sentence + '\n');
-                // get the reply from the server
-        //modifiedSentence = inFromServer.readLine();
-                // print the returned sentence
-        //System.out.println("FROM SERVER: " + modifiedSentence);
-                // close the socket
-        //clientSocket.close();
     }
+    
+    
+    
+    
+    
 }
