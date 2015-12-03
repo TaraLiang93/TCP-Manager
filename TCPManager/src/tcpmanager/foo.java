@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- *
+ * THIS IS A TEST FILE, NOT FINAL AND DON'T INCLUDE
  * @author mk
  */
 public class foo {
@@ -37,7 +37,7 @@ public class foo {
         //read the file
         while(x.hasNextLine())
         {
-            //read and store into the array
+            //read and store the name of type into the array
             String type_in_file = x.nextLine();
             typeArray.add(type_in_file);
         }
@@ -60,7 +60,7 @@ public class foo {
             {
                 System.out.println("Could not get the ports.");
             }
-        
+            //print out all the type there are and its port
             System.out.println("Type " + typeArray.get(i) + "Port " + portArray.get(i));
         
         }

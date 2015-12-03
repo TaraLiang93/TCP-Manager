@@ -18,6 +18,7 @@ class TCPClientManager {
         int portForTypeUserWants = 0;
         Boolean hasType = false;
 
+        //print host name of machine
         System.out.println(argv[0]);
 
         // get the server port form command line
@@ -27,200 +28,209 @@ class TCPClientManager {
             // create an input stream from the System.in
             BufferedReader inFromUser
                     = new BufferedReader(new InputStreamReader(System.in));
-
             
-
-                    // read a line form the standard input
-            //sentence = inFromUser.readLine();
             while (true) {
-                
-                if(hasType == true)
-                {
-                    lisPort =  portForTypeUserWants;
-                }
-                else
-                {
+
+                if (hasType == true) {
+                    lisPort = portForTypeUserWants;
+                } else {
                     lisPort = Integer.parseInt(argv[1]);
                     //lisport is just the argv from the user
                 }
                 Socket clientSocket = null;
                 DataOutputStream outToServer = null;
-                
+
                 // create a client socket (TCP) and connect to server
                 // create an output stream from the socket output stream
-                
-
                 // create an input stream from the socket input stream
                 BufferedReader inFromServer = null;
-                
+
                 sentence = inFromUser.readLine();
-                //parse
-                //modifiedSentence = sentence.concat(" \r\n");
-                //send the sentence read to the server
-                //outToServer.writeBytes(sentence + '\n');
-                
-                if(sentence.trim().equalsIgnoreCase("help"))
-                {
+                String[] sentence_Part = sentence.trim().split(" ");
+
+                if (sentence.trim().equalsIgnoreCase("help")) {
                     //print help menu
-                    System.out.println("<Print help menu>");
-                }
-                else if(sentence.trim().equalsIgnoreCase("exit"))
-                {
-                    System.out.println("<Exiting>");
+                    System.out.println("_______________________________________________________________________________");
+                    System.out.println("Help Menu: \n");
+                    System.out.println("Put <name> <value>: add name "
+                            + "record to the name server "
+                            + "database. If there an existing record with the specific"
+                            + "name update it.\n");
+                    System.out.println("Get <name>: get the value of the "
+                            + "requested name record. If not such record was "
+                            + "found return \"Not Found\".\n");
+                    System.out.println("Del <name>: remove the specific "
+                            + "name record from the service database. If remove "
+                            + "was successful return positive feedback, else "
+                            + "reutn \"Not Found\".\n");
+                    System.out.println("Browse: get all the name record with its"
+                            + " name and type from the database. If the database"
+                            + " is empty return \"Database is empty\".\n");
+                    System.out.println("Type <record type>: get the specific record"
+                            + " type's server address. If the record type was not"
+                            + " found return \"Type not found\".\n");
+                    System.out.println("Done: terminate the connection with current"
+                            + " record type.\n");
+                    System.out.println("Exit: terminate the program and connection.");
+                    System.out.println("_______________________________________________________________________________\n");
+                } else if (sentence.trim().equalsIgnoreCase("exit")) {
+                    System.out.println("Program Exiting ...");
                     System.exit(0);
-                }
-                else if(sentence.trim().startsWith("put"))
-                {   
+                } else if (sentence_Part[0].equalsIgnoreCase("put")) {
                     //get the reply from the server
-                    System.out.println("put case");
-                    System.out.println("waka waka tryna connect" + lisPort);
+                    System.out.println("trying to connect to " + lisPort);
                     clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
-                    System.out.println("i've connected successfully");
+                    System.out.println("i've connected successfully to port: " + lisPort);
                     outToServer = new DataOutputStream(clientSocket.getOutputStream());
                     inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     //modifiedSentence = inFromServer.readLine();
                     // actually send the message to the server, assiming its correct
                     outToServer.writeBytes(sentence + "\n");
-                    System.out.println("I have sent things to the server");
+                    System.out.println("Sent: "+ sentence);
                     //print the returned sentence
-                    System.out.println("wating for server input");
+                    System.out.println("waiting for server");
                     modifiedSentence = inFromServer.readLine();
-                    System.out.println("ive got server input");
                     System.out.println("FROM SERVER: " + modifiedSentence);
+                    if (modifiedSentence.startsWith("202")) {
+                        System.out.println("Error: " + modifiedSentence);
+                    } else if (modifiedSentence.startsWith("505")) {
+                        System.out.println("Error: " + modifiedSentence);
+                    }
+                    System.out.println("");
                     //close the socket
                     clientSocket.close();
-                }
-                else if(sentence.trim().startsWith("get"))
-                {
+                } else if (sentence_Part[0].equalsIgnoreCase("get")) {
                     //get the reply from the server
-                    System.out.println("waka waka tryna connect" + lisPort);
+                    System.out.println("Connecting to " + lisPort);
                     clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
-                    System.out.println("i've connected successfully");
+                    System.out.println("Connected Successfully");
                     outToServer = new DataOutputStream(clientSocket.getOutputStream());
                     inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     outToServer.writeBytes(sentence + "\n");
+                    System.out.println("Sent: "+ sentence);
                     //print the returned sentence
                     modifiedSentence = inFromServer.readLine();
                     System.out.println("FROM SERVER: " + modifiedSentence);
+                    if (modifiedSentence.startsWith("404") || modifiedSentence.startsWith("505")
+                            || modifiedSentence.startsWith("101")) {
+                        System.out.println("Error: " + modifiedSentence);
+                    } else {
+                        String[] parts = modifiedSentence.split(" ");
+                        System.out.print("Value of "+sentence_Part[1]+" is: ");
+                        for (int temp = 2; temp < parts.length; temp++) {
+                            System.out.print(parts[temp] + " ");
+                        }
+                    }
+                    System.out.println("\n");
                     //close the socket
                     clientSocket.close();
-                }
-                else if(sentence.trim().startsWith("del"))
-                {
+                } else if (sentence_Part[0].equalsIgnoreCase("del")) {
                     //delete was good, it was acked
                     //else it was errored
                     //get the reply from the server
                     //modifiedSentence = inFromServer.readLine();
-                    System.out.println("waka waka tryna connect" + lisPort);
+                    System.out.println("Connecting to " + lisPort);
                     clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
-                    System.out.println("i've connected successfully");
+                    System.out.println("Connected successfully");
                     outToServer = new DataOutputStream(clientSocket.getOutputStream());
                     inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     outToServer.writeBytes(sentence + "\n");
+                    System.out.println("Sent: "+ sentence);
                     //print the returned sentence
                     modifiedSentence = inFromServer.readLine();
                     System.out.println("FROM SERVER: " + modifiedSentence);
+                    if (modifiedSentence.startsWith("404") || modifiedSentence.startsWith("505")
+                            || modifiedSentence.startsWith("101")) {
+                        System.out.println("Error: " + modifiedSentence);
+                    }
+                    System.out.println("");
                     //close the socket
                     clientSocket.close();
-                }
-                else if(sentence.trim().startsWith("browse"))
-                {
+                } else if (sentence_Part[0].equalsIgnoreCase("browse")) {
                     //for browse, you returned a message, if the message was a database empty, print, otehrwise parse
                     //send things to the server
-                    System.out.println("waka waka tryna connect" + lisPort);
+                    System.out.println("Connecting to" + lisPort);
                     clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
-                    System.out.println("i've connected successfully");
+                    System.out.println("Connected successfully");
                     outToServer = new DataOutputStream(clientSocket.getOutputStream());
                     inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     outToServer.writeBytes(sentence + "\n");
+                    System.out.println("Sent: "+ sentence);
                     // read bytes
                     modifiedSentence = inFromServer.readLine();
                     //print the returned sentence
-                    
+
                     //check first number
-                    if(modifiedSentence.startsWith("100"))
-                    {
+                    if (modifiedSentence.startsWith("100") || modifiedSentence.startsWith("505")
+                            || modifiedSentence.startsWith("101")) {
                         //database was empty
-                        System.out.println("FROM SERVER: " + modifiedSentence);
-                    }
-                    else
-                    {
+                        System.out.println("Error: " + modifiedSentence);
+                    } else {
                         //parse the command that came back and then print out all the stuff onto the screen
                         //tokenize
                         String[] parts = modifiedSentence.split("&");
-    
+
                         // turn list into an arraylist
                         ArrayList<String> arrayOfSentenceInputs = new ArrayList<String>(Arrays.asList(parts));
-                        
-                        for(int print = 0; print < arrayOfSentenceInputs.size(); print++)
-                        {
+
+                        for (int print = 0; print < arrayOfSentenceInputs.size(); print++) {
                             System.out.println(arrayOfSentenceInputs.get(print));
                         }
                     }
-                    
-                    
+                    System.out.println("");
+
                     //close the socket
                     clientSocket.close();
-                }
-                else if(sentence.trim().startsWith("type") && hasType == false)
-                {
-                    //modifiedSentence = inFromServer.readLine();
-                    //split on the space and then store the type the person wants
-                    System.out.println("waka waka tryna connect" + lisPort);
-                    clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
-                    System.out.println("i've connected successfully");
-                    outToServer = new DataOutputStream(clientSocket.getOutputStream());
-                    inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    System.out.println("ayy must be the money");
-                    String[] typeParts = sentence.split(" ");
-                    
-                    //1st token has the type that the user is looking for
-                    typeUserWants = typeParts[1];
-                    
-                    //once the type is recieved, you want to send to the manager to get the port back
-                    String sendSentence = "Type " + typeUserWants;
-                    outToServer.writeBytes(sendSentence + '\n');
-                    System.out.println("i've sent bytes");
-                    //check what comes back from the server manager
-                    modifiedSentence = inFromServer.readLine();
-                    if(modifiedSentence.startsWith("500"))
-                    {
-                        //port was not found
-                        System.out.println("Port was not found for the type that was specifed by the user.");
+                } else if (sentence_Part[0].equalsIgnoreCase("type")) {
+                    if (hasType == false) {
+                        System.out.println("Trying to connect to port" + lisPort);
+                        clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
+                        System.out.println("connect success");
+                        outToServer = new DataOutputStream(clientSocket.getOutputStream());
+                        inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+                        //split on the space and then store the type the person wants
+                        String[] typeParts = sentence.split(" ");
+
+                        //1st token has the type that the user is looking for
+                        typeUserWants = typeParts[1];
+
+                        //once the type is recieved, you want to send to the manager to get the port back
+                        String sendSentence = "Type " + typeUserWants;
+                        outToServer.writeBytes(sendSentence + '\n');
+                        System.out.println("Sending to Server: " + sendSentence);
+                        //check what comes back from the server manager
+                        modifiedSentence = inFromServer.readLine();
+                        System.out.println("Message from Server: " + modifiedSentence);
+                        if (modifiedSentence.startsWith("500")) {
+                            //port was not found
+                            System.out.println("Error: " + modifiedSentence + "\n");
+                        } else {
+                            //Port somenumber
+                            String[] portParts = modifiedSentence.split(" ");
+                            portForTypeUserWants = Integer.parseInt(portParts[1]);
+                            hasType = true;
+                            System.out.println("we got a response! let's connect to the server");
+                        }
+                        System.out.println("");
+                        //close the socket
+                        clientSocket.close();
+                    } else {
+                        System.out.println("Already inside a specific type, cannot change type before calling done.\n");
                     }
-                    else
-                    {
-                        //Port somenumber
-                        String[] portParts = modifiedSentence.split(" ");
-                        portForTypeUserWants = Integer.parseInt(portParts[1]);
-                        hasType = true;
-                        System.out.println("we got a response! let's connect to the server");
-                    }
-                    //close the socket
-                    clientSocket.close();
-                    System.out.println("im closing the connection now");
-                }
-                else if(sentence.trim().startsWith("done"))
-                {
-                    System.out.println("<done is not supported yet>");
+                } else if (sentence.trim().startsWith("done")) {
                     hasType = false;
+                    System.out.println("No longer in any type group.\n\n");
+                } else {
+                    System.out.println("invlaid arguments\n");
                 }
-                else
-                {
-                    System.out.println("invlaid arguments");
-                }
-                
+
                 //clientSocket.close();
-                
             }
         } catch (IOException e) {
             System.out.println("error is " + e);
         }
 
     }
-    
-    
-    
-    
-    
+
 }
