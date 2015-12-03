@@ -12,14 +12,13 @@ class TCPClientManager {
     public static void main(String argv[]) throws Exception {
         String sentence;
         String modifiedSentence;
-
         String serverMessage;
         String typeUserWants;
         int portForTypeUserWants = 0;
         Boolean hasType = false;
 
         //print host name of machine
-        System.out.println(argv[0]);
+        System.out.println("Host name of the machine: "+argv[0]);
 
         // get the server port form command line
         int lisPort = Integer.parseInt(argv[1]);
@@ -29,13 +28,14 @@ class TCPClientManager {
             BufferedReader inFromUser
                     = new BufferedReader(new InputStreamReader(System.in));
             
+            //The client will never stop unless exit is called
             while (true) {
 
                 if (hasType == true) {
                     lisPort = portForTypeUserWants;
                 } else {
+                //lisport is just the argv from the user, before joining any types
                     lisPort = Integer.parseInt(argv[1]);
-                    //lisport is just the argv from the user
                 }
                 Socket clientSocket = null;
                 DataOutputStream outToServer = null;
@@ -45,17 +45,19 @@ class TCPClientManager {
                 // create an input stream from the socket input stream
                 BufferedReader inFromServer = null;
 
+                //read the input from terminal and split the command in parts 
                 sentence = inFromUser.readLine();
                 String[] sentence_Part = sentence.trim().split(" ");
 
+                //display the help menu is help is entered
                 if (sentence.trim().equalsIgnoreCase("help")) {
-                    //print help menu
-                    System.out.println("_______________________________________________________________________________");
+                    System.out.println("______________________________________"
+                            + "_________________________________________");
                     System.out.println("Help Menu: \n");
                     System.out.println("Put <name> <value>: add name "
                             + "record to the name server "
-                            + "database. If there an existing record with the specific"
-                            + "name update it.\n");
+                            + "database. If there an existing record with the "
+                            + "specific name update it.\n");
                     System.out.println("Get <name>: get the value of the "
                             + "requested name record. If not such record was "
                             + "found return \"Not Found\".\n");
@@ -72,49 +74,64 @@ class TCPClientManager {
                     System.out.println("Done: terminate the connection with current"
                             + " record type.\n");
                     System.out.println("Exit: terminate the program and connection.");
-                    System.out.println("_______________________________________________________________________________\n");
-                } else if (sentence.trim().equalsIgnoreCase("exit")) {
+                    System.out.println("______________________________________"
+                            + "_________________________________________\n");
+                } 
+                else if (sentence.trim().equalsIgnoreCase("exit")) {
+                    //exit the program 
                     System.out.println("Program Exiting ...");
                     System.exit(0);
                 } else if (sentence_Part[0].equalsIgnoreCase("put")) {
-                    //get the reply from the server
                     System.out.println("trying to connect to " + lisPort);
-                    clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
-                    System.out.println("i've connected successfully to port: " + lisPort);
-                    outToServer = new DataOutputStream(clientSocket.getOutputStream());
-                    inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    //modifiedSentence = inFromServer.readLine();
-                    // actually send the message to the server, assiming its correct
+                    //try to connect to the correct server 
+                    clientSocket = new Socket(
+                            InetAddress.getByName(argv[0]), lisPort);
+                    System.out.println("i've connected successfully to port: " 
+                            + lisPort);
+                    outToServer = new DataOutputStream(
+                            clientSocket.getOutputStream());
+                    inFromServer = new BufferedReader(new InputStreamReader(
+                            clientSocket.getInputStream()));
+                    // actually send the message to the server,
+                    //assiming its correct
                     outToServer.writeBytes(sentence + "\n");
+                    //print the message being sent
                     System.out.println("Sent: "+ sentence);
-                    //print the returned sentence
+                    //print the returned sentence and read it
                     System.out.println("waiting for server");
                     modifiedSentence = inFromServer.readLine();
                     System.out.println("FROM SERVER: " + modifiedSentence);
-                    if (modifiedSentence.startsWith("202")) {
+                    //if a error is return then print it out to the terminal                    
+                    //(202 = missing arg,505 = before declearing a type)
+                    if (modifiedSentence.startsWith("202")
+                            ||modifiedSentence.startsWith("505")) {
                         System.out.println("Error: " + modifiedSentence);
-                    } else if (modifiedSentence.startsWith("505")) {
-                        System.out.println("Error: " + modifiedSentence);
-                    }
+                    } 
                     System.out.println("");
                     //close the socket
                     clientSocket.close();
                 } else if (sentence_Part[0].equalsIgnoreCase("get")) {
-                    //get the reply from the server
                     System.out.println("Connecting to " + lisPort);
+                    //try to connect to the correct server 
                     clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
                     System.out.println("Connected Successfully");
                     outToServer = new DataOutputStream(clientSocket.getOutputStream());
                     inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    // actually send the message to the server, assiming its correct
                     outToServer.writeBytes(sentence + "\n");
+                    //print the message being sent
                     System.out.println("Sent: "+ sentence);
                     //print the returned sentence
                     modifiedSentence = inFromServer.readLine();
                     System.out.println("FROM SERVER: " + modifiedSentence);
-                    if (modifiedSentence.startsWith("404") || modifiedSentence.startsWith("505")
+                    //if a error is return then print it out to the terminal
+                    //(404 = Not found, 505 = before declearing a type, 101 = too much or little arg )
+                    if (modifiedSentence.startsWith("404") 
+                            || modifiedSentence.startsWith("505")
                             || modifiedSentence.startsWith("101")) {
                         System.out.println("Error: " + modifiedSentence);
-                    } else {
+                    } 
+                    else {//print the value of the specific record out
                         String[] parts = modifiedSentence.split(" ");
                         System.out.print("Value of "+sentence_Part[1]+" is: ");
                         for (int temp = 2; temp < parts.length; temp++) {
@@ -125,21 +142,24 @@ class TCPClientManager {
                     //close the socket
                     clientSocket.close();
                 } else if (sentence_Part[0].equalsIgnoreCase("del")) {
-                    //delete was good, it was acked
-                    //else it was errored
-                    //get the reply from the server
-                    //modifiedSentence = inFromServer.readLine();
                     System.out.println("Connecting to " + lisPort);
+                    //try to connect to the correct server 
                     clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
                     System.out.println("Connected successfully");
                     outToServer = new DataOutputStream(clientSocket.getOutputStream());
                     inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    // actually send the message to the server, assiming its correct
                     outToServer.writeBytes(sentence + "\n");
+                    //print the message being sent                   
                     System.out.println("Sent: "+ sentence);
                     //print the returned sentence
                     modifiedSentence = inFromServer.readLine();
+                    //print the ack message
                     System.out.println("FROM SERVER: " + modifiedSentence);
-                    if (modifiedSentence.startsWith("404") || modifiedSentence.startsWith("505")
+                    //print to the terminal if a error message is returned
+                    //(404 = Not found, 505 = before declearing a type, 101 = too much or little arg )
+                    if (modifiedSentence.startsWith("404") 
+                            || modifiedSentence.startsWith("505")
                             || modifiedSentence.startsWith("101")) {
                         System.out.println("Error: " + modifiedSentence);
                     }
@@ -147,20 +167,19 @@ class TCPClientManager {
                     //close the socket
                     clientSocket.close();
                 } else if (sentence_Part[0].equalsIgnoreCase("browse")) {
-                    //for browse, you returned a message, if the message was a database empty, print, otehrwise parse
-                    //send things to the server
                     System.out.println("Connecting to" + lisPort);
+                    //try to connect to the correct server 
                     clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
                     System.out.println("Connected successfully");
                     outToServer = new DataOutputStream(clientSocket.getOutputStream());
                     inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    // actually send the message to the server, assiming its correct
                     outToServer.writeBytes(sentence + "\n");
+                    //print the message being sent    
                     System.out.println("Sent: "+ sentence);
                     // read bytes
                     modifiedSentence = inFromServer.readLine();
-                    //print the returned sentence
-
-                    //check first number
+                    //check for error(100 = DB is empty, 505 = before declearing a type, 101 = too much or little arg )
                     if (modifiedSentence.startsWith("100") || modifiedSentence.startsWith("505")
                             || modifiedSentence.startsWith("101")) {
                         //database was empty
@@ -169,10 +188,9 @@ class TCPClientManager {
                         //parse the command that came back and then print out all the stuff onto the screen
                         //tokenize
                         String[] parts = modifiedSentence.split("&");
-
                         // turn list into an arraylist
                         ArrayList<String> arrayOfSentenceInputs = new ArrayList<String>(Arrays.asList(parts));
-
+                        //print all the records' name and type to the terminal
                         for (int print = 0; print < arrayOfSentenceInputs.size(); print++) {
                             System.out.println(arrayOfSentenceInputs.get(print));
                         }
@@ -182,6 +200,7 @@ class TCPClientManager {
                     //close the socket
                     clientSocket.close();
                 } else if (sentence_Part[0].equalsIgnoreCase("type")) {
+                    //only allow type's functionality to work if and only if the client is not in a type group
                     if (hasType == false) {
                         System.out.println("Trying to connect to port" + lisPort);
                         clientSocket = new Socket(InetAddress.getByName(argv[0]), lisPort);
@@ -215,19 +234,19 @@ class TCPClientManager {
                         System.out.println("");
                         //close the socket
                         clientSocket.close();
-                    } else {
+                    } else {//print out the error message that the client is in a type group
                         System.out.println("Already inside a specific type, cannot change type before calling done.\n");
                     }
                 } else if (sentence.trim().startsWith("done")) {
+                    //change hastype so type can be use again
                     hasType = false;
                     System.out.println("No longer in any type group.\n\n");
                 } else {
                     System.out.println("invlaid arguments\n");
                 }
 
-                //clientSocket.close();
             }
-        } catch (IOException e) {
+        } catch (IOException e) {//catch all the input and output exceptions
             System.out.println("error is " + e);
         }
 

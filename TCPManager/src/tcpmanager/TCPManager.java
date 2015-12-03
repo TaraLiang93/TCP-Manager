@@ -75,10 +75,6 @@ public class TCPManager {
         String capitalizedSentence = "";
 
         // get the port number assigned from the command line
-        //int lisPort = Integer.parseInt(argv[0]);
-        /**
-         * ************ WHY IS THIS 6319 **************
-         */
         int lisPort = 0;
         // create a server socket (TCP)
         ServerSocket welcomeSocket = new ServerSocket(lisPort);
@@ -116,7 +112,6 @@ class TCPThreadManager extends Thread {
             //create an input stream from the socket input stream
             BufferedReader inFromClient = new BufferedReader(
                     new InputStreamReader(connectionSocket.getInputStream()));
-//thread
 
             // create an output stream from the socket output stream
             DataOutputStream outToClient

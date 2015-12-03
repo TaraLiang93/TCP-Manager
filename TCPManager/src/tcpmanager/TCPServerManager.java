@@ -1,5 +1,3 @@
-//import static TCPServer.tokenizeCommand;
-
 import java.io.*; // Provides for system input and output through data
 // streams, serialization and the file system
 import java.net.*; // Provides the classes for implementing networking
@@ -17,9 +15,7 @@ class TCPServerManager {
         String clientSentence = "";
         String capitalizedSentence = "";
 
-        //System.out.println(argv[0]);
-        // get the port number assigned from the command line
-        //int lisPort = Integer.parseInt(argv[0]);
+        // get the port number depends on what is free
         int lisPort = 0;
         // create a server socket (TCP)
         ServerSocket welcomeSocket = new ServerSocket(lisPort);
@@ -31,6 +27,7 @@ class TCPServerManager {
             Socket connectionSocket = welcomeSocket.accept();
             System.out.println("waka waka ive connected");
 
+            //create and start new thread
             TCPThread newThread = new TCPThread(connectionSocket, clientSentence, recordsArray, capitalizedSentence, type);
             newThread.start();
         }
@@ -88,10 +85,7 @@ class TCPThread extends Thread {
                         temp++;
                     }
                     newRecord = new Record(arrayOfCommandTokens.get(1), value, type);
-//                                }
-//                                else{
-//                                    newRecord = new Record(arrayOfCommandTokens.get(1),arrayOfCommandTokens.get(2),arrayOfCommandTokens.get(2));
-//                                }
+
                     int foundRecordFlag = 0;
 
                     //check to see if it exist, if does, then replace that one
@@ -106,13 +100,14 @@ class TCPThread extends Thread {
                         }
                     }
 
+                    //no existing record, add new ones
                     if (foundRecordFlag == 0) {
                         recordsArray.add(newRecord);
                         String ackGoodPutMessage = "200 PutOk ";
                         System.out.println(ackGoodPutMessage);
                         outToClient.writeBytes(ackGoodPutMessage + "\n");
                     }
-                } else {
+                } else {//missing arg
                     String ackBadPutMessage = "202 PutNotOk, missing name and/or value of the record. ";
                     System.out.println(ackBadPutMessage);
                     outToClient.writeBytes(ackBadPutMessage + "\n");
@@ -188,7 +183,6 @@ class TCPThread extends Thread {
                     outToClient.writeBytes("101 Too much/little argument" + "\n");
                 }
             } else {
-                //the command was bad
 
             }
 
