@@ -4,8 +4,11 @@
  * and open the template in the editor.
  */
 
-/**
- *
+/**Create a basic object call Record. Contains name String, type String, and 
+ * value String. Name describes the name of the record. Type describes the type 
+ * of the record. Value describes the value of the record. This object contain
+ * constructor that will create the object, with user input of name, value and 
+ * type. This class contain all the accessor and modifier.
  * @author mk
  */
 public class Record {
