@@ -18,7 +18,7 @@ class TCPClientManager {
         Boolean hasType = false;
 
         //print host name of machine
-        System.out.println("Host name of the machine: "+argv[0]);
+        System.out.println("Host name of the machine: "+argv[0]+"\n");
 
         // get the server port form command line
         int lisPort = Integer.parseInt(argv[1]);
@@ -246,7 +246,10 @@ class TCPClientManager {
                 }
 
             }
-        } catch (IOException e) {//catch all the input and output exceptions
+        } catch (ConnectException e){//close the program if the server shut it self for some reason
+            System.out.println("Server close unexpectedly, Program closing.");
+            System.exit(0);
+        }catch (IOException e) {//catch all the input and output exceptions
             System.out.println("error is " + e);
         }
 
