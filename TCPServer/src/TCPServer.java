@@ -82,7 +82,7 @@ class TCPThread extends Thread {
 
                         //check to see if it exist, if does, then replace that one
                         for (int arrayLoop = 0; arrayLoop < recordsArray.size(); arrayLoop++) {
-                            if (recordsArray.get(arrayLoop).getName().equalsIgnoreCase(arrayOfCommandTokens.get(1)) && recordsArray.get(arrayLoop).getType().equalsIgnoreCase(arrayOfCommandTokens.get(2))) {
+                            if (recordsArray.get(arrayLoop).getName().equalsIgnoreCase(arrayOfCommandTokens.get(1)) && recordsArray.get(arrayLoop).getType().equalsIgnoreCase(arrayOfCommandTokens.get(3))) {
                                 recordsArray.remove(arrayLoop);
                                 recordsArray.add(arrayLoop, newRecord);
                                 String ackGoodPutMessage = "200 PutOk ";
