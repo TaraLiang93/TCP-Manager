@@ -70,9 +70,9 @@ class TCPThread extends Thread {
 
                     //the following if check is the type is one of the four: NS, A, CNAME, MX
                     if ((arrayOfCommandTokens.get(3).equalsIgnoreCase("NS"))
-                            || (arrayOfCommandTokens.get(2).equalsIgnoreCase("A"))
-                            || (arrayOfCommandTokens.get(2).equalsIgnoreCase("CNAME"))
-                            || (arrayOfCommandTokens.get(2).equalsIgnoreCase("MX"))) {
+                            || (arrayOfCommandTokens.get(3).equalsIgnoreCase("A"))
+                            || (arrayOfCommandTokens.get(3).equalsIgnoreCase("CNAME"))
+                            || (arrayOfCommandTokens.get(3).equalsIgnoreCase("MX"))) {
 
                         Record newRecord;
                         
@@ -86,7 +86,7 @@ class TCPThread extends Thread {
                                 recordsArray.remove(arrayLoop);
                                 recordsArray.add(arrayLoop, newRecord);
                                 String ackGoodPutMessage = "200 PutOk ";
-                                System.out.println("Sending back: "+ackGoodPutMessage);
+                                System.out.println("Sending back: "+ackGoodPutMessage+"\n");
                                 outToClient.writeBytes(ackGoodPutMessage + "\n");
                                 foundRecordFlag = 1;
                             }
@@ -96,7 +96,7 @@ class TCPThread extends Thread {
                         if (foundRecordFlag == 0) {
                             recordsArray.add(newRecord);
                             String ackGoodPutMessage = "200 PutOk ";
-                            System.out.println("Sending back: "+ackGoodPutMessage);
+                            System.out.println("Sending back: "+ackGoodPutMessage+"\n");
                             outToClient.writeBytes(ackGoodPutMessage + "\n");
                         }
                     }
@@ -107,7 +107,7 @@ class TCPThread extends Thread {
                     }
                 } else {//missing arg
                     String ackBadPutMessage = "202 PutNotOk, missing name and/or value of the record. ";
-                    System.out.println("Sending back: "+ackBadPutMessage);
+                    System.out.println("Sending back: "+ackBadPutMessage+"\n");
                     outToClient.writeBytes(ackBadPutMessage + "\n");
 
                 }
@@ -120,8 +120,8 @@ class TCPThread extends Thread {
                     //else return a error message
                     int foundRecordFlag = 0;
                     for (int arrayLoop = 0; arrayLoop < recordsArray.size(); arrayLoop++) {
-                        if (recordsArray.get(arrayLoop).getName().equalsIgnoreCase(arrayOfCommandTokens.get(1)) && recordsArray.get(arrayLoop).getType().equalsIgnoreCase(arrayOfCommandTokens.get(2))) {
-                            System.out.println("Sending back: " + recordsArray.get(arrayLoop).getValue());
+                        if (recordsArray.get(arrayLoop).getName().equalsIgnoreCase(arrayOfCommandTokens.get(1)) && recordsArray.get(arrayLoop).getType().equalsIgnoreCase(arrayOfCommandTokens.get(3))) {
+                            System.out.println("Sending back: " + recordsArray.get(arrayLoop).getValue()+"\n");
                             outToClient.writeBytes("400 GetOK " + recordsArray.get(arrayLoop).getValue() + "\n");
                             foundRecordFlag = 1;
                         }
@@ -136,7 +136,7 @@ class TCPThread extends Thread {
                     }
                 } else {
                     outToClient.writeBytes("101 Too much/little argument" + "\n");
-                    System.out.println("Sending back: "+"101 Too much/little argument");
+                    System.out.println("Sending back: "+"101 Too much/little argument\n");
                 }
             } else if (arrayOfCommandTokens.get(0).equalsIgnoreCase("del")) {
                 //make sure there is enough arg (del, name and type)
@@ -145,11 +145,11 @@ class TCPThread extends Thread {
                     //name and type
                     int foundRecordFlag = 0;
                     for (int arrayLoop = 0; arrayLoop < recordsArray.size(); arrayLoop++) {
-                        if (recordsArray.get(arrayLoop).getName().equalsIgnoreCase(arrayOfCommandTokens.get(1)) && recordsArray.get(arrayLoop).getType().equalsIgnoreCase(arrayOfCommandTokens.get(2))) {
+                        if (recordsArray.get(arrayLoop).getName().equalsIgnoreCase(arrayOfCommandTokens.get(1)) && recordsArray.get(arrayLoop).getType().equalsIgnoreCase(arrayOfCommandTokens.get(3))) {
                             recordsArray.remove(arrayLoop);
                             String deleteGoodMessage = "300 DeleteOk";
                             outToClient.writeBytes(deleteGoodMessage + "\n");
-                            System.out.println("Sending back "+deleteGoodMessage);
+                            System.out.println("Sending back "+deleteGoodMessage+"\n");
                             foundRecordFlag = 1;
                         }
                     }
@@ -157,12 +157,12 @@ class TCPThread extends Thread {
                     if (foundRecordFlag == 0) {
                         //send error message
                         String errorMessage = "404 Not Found";
-                        System.out.println("Sending back: 404 Not Found");
+                        System.out.println("Sending back: 404 Not Found\n");
                         outToClient.writeBytes(errorMessage + "\n");
                     }
                 } else {//not enough input arg
                     outToClient.writeBytes("101 Too much/little argument" + "\n");
-                    System.out.println("Sending back: 101 Too much/little argument");
+                    System.out.println("Sending back: 101 Too much/little argument\n");
                 }
 
             } else if (arrayOfCommandTokens.get(0).equalsIgnoreCase("browse")) {
@@ -177,7 +177,7 @@ class TCPThread extends Thread {
                     if (recordsArray.isEmpty()) {
                         String errorEmptyMessage = "100 Database Is Empty";
                         outToClient.writeBytes(errorEmptyMessage + "\n");
-                        System.out.println("Sending back: "+errorEmptyMessage);
+                        System.out.println("Sending back: "+errorEmptyMessage+"\n");
                     } else {
                         //otherwise, loop through the string and then send it over to the client
                         for (int arrayLoop = 0; arrayLoop < recordsArray.size(); arrayLoop++) {
@@ -185,12 +185,13 @@ class TCPThread extends Thread {
                         }
                         //once you have the entire string
                         outToClient.writeBytes(s + "\n");
-                        System.out.println("Sending back: "+s);
+                        System.out.println("Sending back: "+s+"\n");
                     }
 
                 } else {
                     outToClient.writeBytes("101 Too much/little argument" + "\n");
-                    System.out.println("Sending back: 101 Too much/little argument");
+                    System.out.println("Sending back: 101 Too much/little argument\n");
+                    
                 }
             } else {
 
