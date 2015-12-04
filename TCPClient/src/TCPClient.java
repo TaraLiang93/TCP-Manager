@@ -16,7 +16,7 @@ class TCPClient {
         String serverMessage;
 
         //prints the host name of the machine
-        System.out.println("Host name of the Machine: "+argv[0]);
+        System.out.println("Host name of the Machine: "+argv[0]+"\n");
 
         // get the server port form command line
         int lisPort = Integer.parseInt(argv[1]);
