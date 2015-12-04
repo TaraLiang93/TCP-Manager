@@ -20,7 +20,7 @@ class TCPServer {
         int lisPort = 0;
         // create a server socket (TCP)
         ServerSocket welcomeSocket = new ServerSocket(lisPort);
-        System.out.println("Server runs on port: " + welcomeSocket.getLocalPort());
+        System.out.println("Server runs on port: " + welcomeSocket.getLocalPort()+"\n");
         // loop infinitely (process clients sequentially)
         while (true) {
             // Wait and accept client connection
@@ -69,20 +69,14 @@ class TCPThread extends Thread {
                 if (arrayOfCommandTokens.size() > 3) {
 
                     //the following if check is the type is one of the four: NS, A, CNAME, MX
-                    if ((arrayOfCommandTokens.get(2).equalsIgnoreCase("NS"))
+                    if ((arrayOfCommandTokens.get(3).equalsIgnoreCase("NS"))
                             || (arrayOfCommandTokens.get(2).equalsIgnoreCase("A"))
                             || (arrayOfCommandTokens.get(2).equalsIgnoreCase("CNAME"))
                             || (arrayOfCommandTokens.get(2).equalsIgnoreCase("MX"))) {
 
                         Record newRecord;
-                        //there is multiple word for value need to concate it and create the newRecord.
-                        int temp = 4;
-                        String value = arrayOfCommandTokens.get(3);
-                        while (temp != arrayOfCommandTokens.size()) {
-                            value = value.concat(" ").concat(arrayOfCommandTokens.get(temp));
-                            temp++;
-                        }
-                        newRecord = new Record(arrayOfCommandTokens.get(1), value, arrayOfCommandTokens.get(2));
+                        
+                        newRecord = new Record(arrayOfCommandTokens.get(1), arrayOfCommandTokens.get(2), arrayOfCommandTokens.get(3));
 
                         int foundRecordFlag = 0;
 
@@ -92,7 +86,7 @@ class TCPThread extends Thread {
                                 recordsArray.remove(arrayLoop);
                                 recordsArray.add(arrayLoop, newRecord);
                                 String ackGoodPutMessage = "200 PutOk ";
-                                System.out.println(ackGoodPutMessage);
+                                System.out.println("Sending back: "+ackGoodPutMessage);
                                 outToClient.writeBytes(ackGoodPutMessage + "\n");
                                 foundRecordFlag = 1;
                             }
@@ -102,17 +96,18 @@ class TCPThread extends Thread {
                         if (foundRecordFlag == 0) {
                             recordsArray.add(newRecord);
                             String ackGoodPutMessage = "200 PutOk ";
-                            System.out.println(ackGoodPutMessage);
+                            System.out.println("Sending back: "+ackGoodPutMessage);
                             outToClient.writeBytes(ackGoodPutMessage + "\n");
                         }
                     }
                     else{//send back an error message that the input type is invalid
                         outToClient.writeBytes("204 Not a Valid Type\n");
+                        System.out.println("Sending back: 204 Not a Valid Type\n");
 
                     }
                 } else {//missing arg
                     String ackBadPutMessage = "202 PutNotOk, missing name and/or value of the record. ";
-                    System.out.println(ackBadPutMessage);
+                    System.out.println("Sending back: "+ackBadPutMessage);
                     outToClient.writeBytes(ackBadPutMessage + "\n");
 
                 }
@@ -135,12 +130,13 @@ class TCPThread extends Thread {
                     //didn't find the record send back an error
                     if (foundRecordFlag == 0) {
                         //send error message
-                        System.out.println("404 NotFound");
-                        String errorMessage = "404 NotFound";
-                        outToClient.writeBytes(errorMessage + "\n");
+                        System.out.println("404 Not Found");
+                        String errorMessage = "404 Not Found";
+                        outToClient.writeBytes("Sending back: "+errorMessage + "\n");
                     }
                 } else {
                     outToClient.writeBytes("101 Too much/little argument" + "\n");
+                    System.out.println("Sending back: "+"101 Too much/little argument");
                 }
             } else if (arrayOfCommandTokens.get(0).equalsIgnoreCase("del")) {
                 //make sure there is enough arg (del, name and type)
@@ -153,17 +149,20 @@ class TCPThread extends Thread {
                             recordsArray.remove(arrayLoop);
                             String deleteGoodMessage = "300 DeleteOk";
                             outToClient.writeBytes(deleteGoodMessage + "\n");
+                            System.out.println("Sending back "+deleteGoodMessage);
                             foundRecordFlag = 1;
                         }
                     }
 
                     if (foundRecordFlag == 0) {
                         //send error message
-                        String errorMessage = "404 NotFound";
+                        String errorMessage = "404 Not Found";
+                        System.out.println("Sending back: 404 Not Found");
                         outToClient.writeBytes(errorMessage + "\n");
                     }
                 } else {//not enough input arg
                     outToClient.writeBytes("101 Too much/little argument" + "\n");
+                    System.out.println("Sending back: 101 Too much/little argument");
                 }
 
             } else if (arrayOfCommandTokens.get(0).equalsIgnoreCase("browse")) {
@@ -176,8 +175,9 @@ class TCPThread extends Thread {
 
                     //check if empty
                     if (recordsArray.isEmpty()) {
-                        String errorEmptyMessage = "100 DatabaseIsEmpty";
+                        String errorEmptyMessage = "100 Database Is Empty";
                         outToClient.writeBytes(errorEmptyMessage + "\n");
+                        System.out.println("Sending back: "+errorEmptyMessage);
                     } else {
                         //otherwise, loop through the string and then send it over to the client
                         for (int arrayLoop = 0; arrayLoop < recordsArray.size(); arrayLoop++) {
@@ -185,10 +185,12 @@ class TCPThread extends Thread {
                         }
                         //once you have the entire string
                         outToClient.writeBytes(s + "\n");
+                        System.out.println("Sending back: "+s);
                     }
 
                 } else {
                     outToClient.writeBytes("101 Too much/little argument" + "\n");
+                    System.out.println("Sending back: 101 Too much/little argument");
                 }
             } else {
 
@@ -199,7 +201,6 @@ class TCPThread extends Thread {
 
             System.out.println("Hello world!");
             System.out.println("input is: " + clientSentence);
-            System.out.println("output is: " + capitalizedSentence);
 
             // send the capitalized sentence back to the  client
             //outToClient.writeBytes(capitalizedSentence);
