@@ -76,6 +76,7 @@ class TCPClient {
                 else if(sentence_Part[0].equalsIgnoreCase("put"))
                 {   
                     outToServer.writeBytes(sentence + '\n');
+                    System.out.println("TO SERVER: "+sentence);
                     //get the reply from the server
                     modifiedSentence = inFromServer.readLine();
                     //print the returned sentence
@@ -92,7 +93,8 @@ class TCPClient {
                 }
                 else if(sentence_Part[0].equalsIgnoreCase("get"))
                 {
-                    outToServer.writeBytes(sentence + '\n');
+                    outToServer.writeBytes(sentence + '\n'); 
+                    System.out.println("TO SERVER: "+sentence);
                     //get the reply from the server
                     modifiedSentence = inFromServer.readLine();
                     //print the returned sentence
@@ -120,6 +122,7 @@ class TCPClient {
                     //delete was good, it was acked
                     //else it was errored
                     outToServer.writeBytes(sentence + '\n');
+                    System.out.println("TO SERVER: "+sentence);
                     //get the reply from the server
                     modifiedSentence = inFromServer.readLine();
                     //print the returned sentence
@@ -139,6 +142,7 @@ class TCPClient {
                 {
                     //for browse, you returned a message, if the message was a database empty, print, otehrwise parse
                     outToServer.writeBytes(sentence + '\n');
+                    System.out.println("TO SERVER: "+sentence);
                     //get the reply from the server
                     modifiedSentence = inFromServer.readLine();
                     //print the returned sentence
@@ -174,9 +178,13 @@ class TCPClient {
                 }
                 
             }
-        } catch (IOException e) {
+        } catch (ConnectException e){//close the program if the server shut it self for some reason
+            System.out.println("Server close unexpectedly, Program closing.");
+            System.exit(0);
+        }catch (IOException e) {
             System.out.println("error is " + e);
-        }
+        } 
+      
 
     }
     
