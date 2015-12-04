@@ -66,6 +66,7 @@ public class TCPManager {
             } catch (Exception f) {
                 System.out.println("Could not get the ports.");
             }
+            System.out.println("testing bound index "+i);
             //print out the type and the port number it running on
             System.out.println("Type " + typeArray.get(i) + " Port " + portArray.get(i));
 
