@@ -25,7 +25,7 @@ class TCPServerManager {
         while (true) {
             // Wait and accept client connection
             Socket connectionSocket = welcomeSocket.accept();
-            System.out.println("waka waka ive connected");
+            System.out.println("I am connected.");
 
             //create and start new thread
             TCPThread newThread = new TCPThread(connectionSocket, clientSentence, recordsArray, capitalizedSentence, type);
@@ -54,7 +54,7 @@ class TCPThread extends Thread {
     public void run() {
         try {
 
-            System.out.println("im running the thread");
+            System.out.println("The TCPThread is started.");
             //create an input stream from the socket input stream
             BufferedReader inFromClient = new BufferedReader(
                     new InputStreamReader(connectionSocket.getInputStream()));
@@ -64,7 +64,7 @@ class TCPThread extends Thread {
                     = new DataOutputStream(connectionSocket.getOutputStream());
 
             // read a line form the input stream
-            System.out.println("im waiting for things from the client");
+            System.out.println("Waiting for client input...");
             clientSentence = inFromClient.readLine();
             System.out.println(clientSentence); // print the sentence i just got
 
@@ -186,15 +186,6 @@ class TCPThread extends Thread {
 
             }
 
-            // capitalize the sentence
-            capitalizedSentence = clientSentence.toUpperCase() + '\n';
-
-            System.out.println("Hello world!");
-            System.out.println("input is: " + clientSentence);
-            System.out.println("output is: " + capitalizedSentence);
-
-            // send the capitalized sentence back to the  client
-            outToClient.writeBytes(capitalizedSentence + "\n");
 
             // close the connection socket
             connectionSocket.close();

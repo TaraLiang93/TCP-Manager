@@ -184,14 +184,6 @@ class TCPThread extends Thread {
 
             }
 
-            // capitalize the sentence
-            capitalizedSentence = clientSentence.toUpperCase() + '\n';
-
-            System.out.println("Hello world!");
-            System.out.println("input is: " + clientSentence+"\n");
-
-            // send the capitalized sentence back to the  client
-            //outToClient.writeBytes(capitalizedSentence);
             // close the connection socket
             connectionSocket.close();
         } catch (Exception e) {

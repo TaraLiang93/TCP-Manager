@@ -229,7 +229,7 @@ class TCPClientManager {
                             String[] portParts = modifiedSentence.split(" ");
                             portForTypeUserWants = Integer.parseInt(portParts[1]);
                             hasType = true;
-                            System.out.println("we got a response! let's connect to the server");
+                            System.out.println("Response recieved.");
                         }
                         System.out.println("");
                         //close the socket
